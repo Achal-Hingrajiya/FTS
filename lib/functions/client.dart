@@ -8,17 +8,15 @@ import 'package:office_doc_tracing/models/TokenResponseBody.dart';
 class APICLient {
   final Dio dio = Dio();
 
-  Future<CreateUserResBody?> createUser(
-    String token,
-    String fullName,
-    String email,
-    String password,
-    String mobileNumber,
-    String dateOfBirth,
-    List<String> permissions,
-    List<String> active_documents,
-    List<String> closed_documents,
-  ) async {
+  Future<CreateUserResBody?> createUser(String token,
+      String fullName,
+      String email,
+      String password,
+      String mobileNumber,
+      String dateOfBirth,
+      List<String> permissions,
+      List<String> active_documents,
+      List<String> closed_documents,) async {
     var data = CreateUserReqBody(
       fullName: fullName,
       email: email,
@@ -56,10 +54,8 @@ class APICLient {
     }
   }
 
-  Future<TokenResponseBody?> getToken(
-    String username,
-    String password,
-  ) async {
+  Future<TokenResponseBody?> getToken(String username,
+      String password,) async {
     var data = GetTokenBody(
       username: username,
       password: password,
@@ -87,5 +83,68 @@ class APICLient {
     }
   }
 
-  // Future<>
+  // Future<ListAllDocumentRespBody?> getAllDocument() async {
+  //   try {
+  //     final response = await dio.post(
+  //         "$baseURL/token",
+  //         options: Options(headers: {
+  //           'accept': 'application/json',
+  //           'Content-Type': 'application/x-www-form-urlencoded'
+  //         })
+  //     );
+  //     if (response.statusCode == 200) {
+  //       print("All doc fetched successful");
+  //       print('All docs Response: ${response.data}');
+  //       return TokenResponseBody.fromJson(response.data);
+  //     } else {
+  //       print('Login Response with error: ${response.data}');
+  //     }
+  //     return null;
+  //   } catch (e) {
+  //     print("Error occurred.\n${e.toString()}");
+  //     return null;
+  //   }
+  // }
+
+// Future<CreateUserResBody?> createBranch(
+//   String token,
+//   String branchName,
+//   String branchDescription,
+//   String branchAddress,
+//   String branchCity,
+//   String branchState,
+//   String branchCountry,
+//   String pincode,
+// ) async {
+//   var data = CreateBranchReqBody(
+//     branchAddress: branchAddress,
+//     branchName: branchName,
+//     city: branchCity,
+//     state: branchState,
+//     country: branchCountry,
+//     description: branchDescription,
+//     pin: pincode
+//   );
+//   try {
+//     final response = await dio.post(
+//       "$baseURL/token",
+//       options: Options(headers: {
+//         'accept': 'application/json',
+//         'Content-Type': 'application/x-www-form-urlencoded'
+//       }),
+//       data: data.toJson(),
+//     );
+//     if (response.statusCode == 200) {
+//       print("Login successful");
+//       print('Login Response: ${response.data}');
+//       return TokenResponseBody.fromJson(response.data);
+//     } else {
+//       print('Login Response with error: ${response.data}');
+//     }
+//     return null;
+//   } catch (e) {
+//     print("Error occurred.\n${e.toString()}");
+//     return null;
+//   }
+// }
 }

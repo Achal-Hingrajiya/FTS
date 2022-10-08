@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:office_doc_tracing/constants.dart';
 import 'package:office_doc_tracing/functions/client.dart';
-import 'package:office_doc_tracing/widgets/custom_password_form_field.dart';
 import 'package:office_doc_tracing/widgets/custom_positive_button.dart';
 import 'package:office_doc_tracing/widgets/custom_text_form_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -55,8 +54,14 @@ class _CreateBranchScreenState extends State<CreateBranchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery
+        .of(context)
+        .size
+        .height;
+    var width = MediaQuery
+        .of(context)
+        .size
+        .width;
     var section1_width = width * 0.3265625;
     var pading_around_form_desktop = EdgeInsets.fromLTRB(
       width * 0.1015625,
@@ -90,12 +95,10 @@ class _CreateBranchScreenState extends State<CreateBranchScreen> {
     );
   }
 
-  Row _buildDesktopSignupScreen(
-      double height,
+  Row _buildDesktopSignupScreen(double height,
       double section1_width,
       EdgeInsets pading_around_form,
-      BuildContext context,
-      ) {
+      BuildContext context,) {
     return Row(
       children: [
         Container(
@@ -129,12 +132,10 @@ class _CreateBranchScreenState extends State<CreateBranchScreen> {
     );
   }
 
-  Container _buildFormContainer(
-      double height,
+  Container _buildFormContainer(double height,
       EdgeInsets pading_around_form,
       BuildContext context,
-      bool isDesktop,
-      ) {
+      bool isDesktop,) {
     return Container(
       height: height,
       color: greyF0F5F9,
@@ -278,46 +279,51 @@ class _CreateBranchScreenState extends State<CreateBranchScreen> {
         var _response;
         try {
           try {
-            print("Tokkken: ${token!}\nFull name: ${_branchNameController.text}\nEmail: ${_descriptionController.text}\nPassword: ${_branchStateController.text}\nMobile: ${_branchAddressController.text}");
+            print(
+                "Tokkken: ${token!}\nFull name: ${_branchNameController
+                    .text}\nEmail: ${_descriptionController
+                    .text}\nPassword: ${_branchStateController
+                    .text}\nMobile: ${_branchAddressController.text}");
           } catch (e) {
             print("Error occurred Tooken is null: ${e.toString()}");
           }
-          _response = await _client.createUser(
-              token!,
-              _branchNameController.text,
-              _descriptionController.text,
-              _branchStateController.text,
-              _branchAddressController.text,
-              "2001-10-04",
-              ["All permissions"],
-              [],
-              []);
-        } catch (e) {
-          print("Error occurred while user creation : ${e.toString()}");
+          // _response = await _client.createBranch(
+          //     token!,
+          //     _branchNameController.text,
+          //     _descriptionController.text,
+          //     _branchAddressController.text,
+          //     _branchCityController.text,
+          //     _branchStateController.text,
+          //     _branchCountryController.text,
+          //     _branchPincodeController.text);
+          } catch (e)
+          {
+            print("Error occurred while user creation : ${e.toString()}");
+          }
+
+          if (_response == Null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('User Creation failed.'),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                    'User named, ${_response!
+                        .fullName}!\nHaving email: ${_response
+                        .email} created successfully.'),
+              ),
+            );
+          }
+
+          setState(() {
+            _isLoading = false;
+          });
         }
-
-
-        if (_response == Null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('User Creation failed.'),
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  'User named, ${_response!.fullName}!\nHaving email: ${_response.email} created successfully.'),
-            ),
-          );
-        }
-
-        setState(() {
-          _isLoading = false;
-        });
       }
     }
-  }
 
   String? _validateName(value) {
     if (value == null || value.isEmpty) {
@@ -346,5 +352,4 @@ class _CreateBranchScreenState extends State<CreateBranchScreen> {
     }
     return null;
   }
-
 }

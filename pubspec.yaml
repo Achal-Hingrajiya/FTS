@@ -37,6 +37,7 @@ dependencies:
   dio: ^4.0.6
   syncfusion_flutter_datepicker: ^20.3.48
   shared_preferences: ^2.0.15
+  expandable: ^5.0.1
 
 dev_dependencies:
   flutter_test:
