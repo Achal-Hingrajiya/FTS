@@ -23,12 +23,12 @@ class _CustomPositiveButtonState extends State<CustomPositiveButton> {
     return ElevatedButton(
       onPressed: widget.onPressed,
       style: ElevatedButton.styleFrom(
-        primary: green6EEB83,
+        backgroundColor: grey5261,
         padding: const EdgeInsets.symmetric(
           vertical: 17,
           horizontal: 48,
         ),
-        shape: const ContinuousRectangleBorder(),
+        shape: const RoundedRectangleBorder(),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,

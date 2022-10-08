@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:office_doc_tracing/constants.dart';
+import 'package:office_doc_tracing/screens/create_user_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -9,6 +11,21 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  String? token;
+
+  fetchTokenFromPref() async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    token = _prefs.getString("token");
+
+    print("Get tooooken: $token");
+  }
+
+  @override
+  void initState() {
+    fetchTokenFromPref();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
@@ -37,17 +54,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
       drawer: Drawer(
         child: Column(
           children: [
-            Container(
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.add_circle,
-                    color: greyA5A5A5,
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => CreateUserScreen(),
                   ),
-                  Text("Create new document")
-                ],
+                );
+              },
+              child: Text(
+                "Create new user",
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -92,7 +110,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Container(
           height: height,
           width: 4,
-          color: green6EEB83,
+          color: grey5261,
         ),
       ],
     );

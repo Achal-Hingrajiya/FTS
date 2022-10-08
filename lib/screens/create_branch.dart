@@ -1,34 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:office_doc_tracing/constants.dart';
 import 'package:office_doc_tracing/functions/client.dart';
-import 'package:office_doc_tracing/screens/login_screen.dart';
 import 'package:office_doc_tracing/widgets/custom_password_form_field.dart';
 import 'package:office_doc_tracing/widgets/custom_positive_button.dart';
 import 'package:office_doc_tracing/widgets/custom_text_form_field.dart';
-import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class UpdateUserScreen extends StatefulWidget {
-  const UpdateUserScreen({Key? key}) : super(key: key);
+class CreateBranchScreen extends StatefulWidget {
+  const CreateBranchScreen({Key? key}) : super(key: key);
 
   @override
-  State<UpdateUserScreen> createState() => _UpdateUserScreenState();
+  State<CreateBranchScreen> createState() => _CreateBranchScreenState();
 }
 
-class _UpdateUserScreenState extends State<UpdateUserScreen> {
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _userNameController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
+class _CreateBranchScreenState extends State<CreateBranchScreen> {
+  final _descriptionController = TextEditingController();
+  final _branchAddressController = TextEditingController();
+  final _branchNameController = TextEditingController();
+  final _branchStateController = TextEditingController();
+  final _branchCityController = TextEditingController();
+  final _branchCountryController = TextEditingController();
+  final _branchPincodeController = TextEditingController();
+  final _createBranchFormKey = GlobalKey<FormState>();
   bool _isLoading = false;
+
+  String? token;
+
+  fetchTokenFromPref() async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    setState(() {
+      token = _prefs.getString("token");
+    });
+    // print("Get tooooken in create user screen: $token");
+  }
+
+  @override
+  void initState() {
+    fetchTokenFromPref();
+    super.initState();
+  }
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _userNameController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
+    _descriptionController.dispose();
+    _branchAddressController.dispose();
+    _branchNameController.dispose();
+    _branchStateController.dispose();
+    _branchCityController.dispose();
+    _branchCountryController.dispose();
+    _branchPincodeController.dispose();
+
     super.dispose();
   }
 
@@ -36,14 +57,14 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    var section1Width = width * 0.3265625;
-    var padingAroundFormDesktop = EdgeInsets.fromLTRB(
+    var section1_width = width * 0.3265625;
+    var pading_around_form_desktop = EdgeInsets.fromLTRB(
       width * 0.1015625,
       height * 0.108333,
       width * 0.10703,
       height * 0.15833,
     );
-    var padingAroundFormMobile = EdgeInsets.fromLTRB(
+    var pading_around_form_mobile = EdgeInsets.fromLTRB(
       width * 0.1015625,
       height * 0.108333,
       width * 0.10703,
@@ -56,13 +77,13 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
       body: width > 1000
           ? _buildDesktopSignupScreen(
         height,
-        section1Width,
-        padingAroundFormDesktop,
+        section1_width,
+        pading_around_form_desktop,
         context,
       )
           : _buildFormContainer(
         height,
-        padingAroundFormMobile,
+        pading_around_form_mobile,
         context,
         false,
       ),
@@ -71,21 +92,21 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
 
   Row _buildDesktopSignupScreen(
       double height,
-      double section1Width,
-      EdgeInsets padingAroundForm,
+      double section1_width,
+      EdgeInsets pading_around_form,
       BuildContext context,
       ) {
     return Row(
       children: [
         Container(
           height: height,
-          width: section1Width,
+          width: section1_width,
           color: black,
           child: Center(
             child: RotatedBox(
               quarterTurns: -1,
               child: Text(
-                "Update User Details",
+                "Create Branch",
                 style: bold64white,
               ),
             ),
@@ -99,7 +120,7 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
         Expanded(
           child: _buildFormContainer(
             height,
-            padingAroundForm,
+            pading_around_form,
             context,
             true,
           ),
@@ -110,14 +131,14 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
 
   Container _buildFormContainer(
       double height,
-      EdgeInsets paddingAroundForm,
+      EdgeInsets pading_around_form,
       BuildContext context,
       bool isDesktop,
       ) {
     return Container(
       height: height,
-      color: black,
-      padding: paddingAroundForm,
+      color: greyF0F5F9,
+      padding: pading_around_form,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -131,11 +152,11 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
                   children: [
                     Text(
                       "Welcome",
-                      style: regular48white,
+                      style: regular48black,
                     ),
                     Text(
-                      "Let’s update user details quickly",
-                      style: light24greyA5A5A5,
+                      "Let’s create a new branch quickly",
+                      style: light24black,
                     ),
                   ],
                 ),
@@ -147,28 +168,52 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
           ),
           Expanded(
             child: Form(
-              key: _formKey,
+              key: _createBranchFormKey,
               child: SingleChildScrollView(
                 child: Column(
                   children: [
                     CustomTextFormField(
-                      hintText: "Enter user's full name",
-                      controller: _nameController,
+                      hintText: "Enter branch name",
+                      controller: _branchNameController,
                       validator: _validateName,
                     ),
                     sizedBoxH22W0,
                     CustomTextFormField(
-                      hintText: "Enter user's email",
-                      controller: _emailController,
+                      hintText: "Enter description",
+                      controller: _descriptionController,
                       validator: _validateEmail,
                     ),
                     sizedBoxH22W0,
                     CustomTextFormField(
-                      hintText: "Enter user's mobile number",
-                      controller: _emailController,
+                      hintText: "Enter branch address",
+                      controller: _branchAddressController,
                       validator: _validateEmail,
                     ),
-
+                    sizedBoxH22W0,
+                    CustomTextFormField(
+                      hintText: "Enter branch city",
+                      controller: _branchCityController,
+                      validator: _validateEmail,
+                    ),
+                    sizedBoxH22W0,
+                    CustomTextFormField(
+                      hintText: "Enter branch state",
+                      controller: _branchStateController,
+                      validator: _validateEmail,
+                    ),
+                    sizedBoxH22W0,
+                    CustomTextFormField(
+                      hintText: "Enter branch country",
+                      controller: _branchCountryController,
+                      validator: _validateEmail,
+                    ),
+                    sizedBoxH22W0,
+                    CustomTextFormField(
+                      hintText: "Enter branch pincode",
+                      controller: _branchPincodeController,
+                      validator: _validateEmail,
+                    ),
+                    sizedBoxH22W0,
                   ],
                 ),
               ),
@@ -190,14 +235,13 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
         SizedBox(
           width: 225,
           child: CustomPositiveButton(
-            text: "SAVE CHANGES",
+            text: "CREATE BRANCH",
             isLoading: _isLoading,
             onPressed: () {
               _validateAndSubmitForm(context);
             },
           ),
         ),
-
       ],
     );
   }
@@ -207,7 +251,7 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         CustomPositiveButton(
-          text: "SAVE CHANGES",
+          text: "CREATE BRANCH",
           isLoading: _isLoading,
           onPressed: () {
             _validateAndSubmitForm(context);
@@ -219,7 +263,7 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
 
   Future<void> _validateAndSubmitForm(BuildContext context) async {
     {
-      if (_formKey.currentState!.validate()) {
+      if (_createBranchFormKey.currentState!.validate()) {
         setState(() {
           _isLoading = true;
         });
@@ -231,28 +275,42 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
         );
 
         var _client = APICLient();
-        // var _response = await _client.createUser(
-        //   _userNameController.text.toString(),
-        //   _nameController.text.toString(),
-        //   _emailController.text.toString(),
-        //   false,
-        //   _passwordController.text.toString(),
-        // );
-        //
-        // if (_response == Null) {
-        //   ScaffoldMessenger.of(context).showSnackBar(
-        //     const SnackBar(
-        //       content: Text('Signup failed.'),
-        //     ),
-        //   );
-        // } else {
-        //   ScaffoldMessenger.of(context).showSnackBar(
-        //     SnackBar(
-        //       content: Text(
-        //           'Welcome, ${_response!}!\nYou are successfully Signed Up.'),
-        //     ),
-        //   );
-        // }
+        var _response;
+        try {
+          try {
+            print("Tokkken: ${token!}\nFull name: ${_branchNameController.text}\nEmail: ${_descriptionController.text}\nPassword: ${_branchStateController.text}\nMobile: ${_branchAddressController.text}");
+          } catch (e) {
+            print("Error occurred Tooken is null: ${e.toString()}");
+          }
+          _response = await _client.createUser(
+              token!,
+              _branchNameController.text,
+              _descriptionController.text,
+              _branchStateController.text,
+              _branchAddressController.text,
+              "2001-10-04",
+              ["All permissions"],
+              [],
+              []);
+        } catch (e) {
+          print("Error occurred while user creation : ${e.toString()}");
+        }
+
+
+        if (_response == Null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('User Creation failed.'),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'User named, ${_response!.fullName}!\nHaving email: ${_response.email} created successfully.'),
+            ),
+          );
+        }
 
         setState(() {
           _isLoading = false;
@@ -289,10 +347,4 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
     return null;
   }
 
-  String? _validateConfirmPassword(value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter some text';
-    }
-    return null;
-  }
 }

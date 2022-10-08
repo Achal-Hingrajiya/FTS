@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:office_doc_tracing/constants.dart';
 import 'package:office_doc_tracing/functions/client.dart';
+import 'package:office_doc_tracing/models/TokenResponseBody.dart';
 import 'package:office_doc_tracing/screens/create_user_screen.dart';
+import 'package:office_doc_tracing/screens/dashboard_screen.dart';
 import 'package:office_doc_tracing/widgets/custom_password_form_field.dart';
 import 'package:office_doc_tracing/widgets/custom_positive_button.dart';
 import 'package:office_doc_tracing/widgets/custom_text_form_field.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -18,6 +21,14 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+
+  Future setTokenPref(String token) async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    _prefs.setString("token", token);
+    // print("Toooooken set: $token");
+    String? pref_token = _prefs.getString("token");
+    print("Get tooooken from Pref: $pref_token");
+  }
 
   @override
   void dispose() {
@@ -88,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Container(
           height: height,
           width: 4,
-          color: green6EEB83,
+          color: grey5261,
         ),
         Expanded(
           child: _buildFormContainer(
@@ -110,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
   ) {
     return Container(
       height: height,
-      color: black,
+      color: greyF0F5F9,
       padding: pading_around_form,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,7 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     Text(
                       "Welcome",
-                      style: regular48white,
+                      style: regular48black,
                     ),
                     Text(
                       "Let’s log you in quickly",
@@ -174,7 +185,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Column _buildMobileBottomNav(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-
       children: [
         SizedBox(
           child: CustomPositiveButton(
@@ -185,29 +195,29 @@ class _LoginScreenState extends State<LoginScreen> {
             },
           ),
         ),
-        const SizedBox(height: 45),
-        Text(
-          "don't have an account?",
-          style: regular20white,
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => const CreateUserScreen(),
-              ),
-            );
-          },
-          style: ButtonStyle(
-            padding: MaterialStateProperty.all(
-              EdgeInsets.zero,
-            ),
-          ),
-          child: Text(
-            "sign up",
-            style: regular20green6EEB83,
-          ),
-        ),
+        // const SizedBox(height: 45),
+        // Text(
+        //   "don't have an account?",
+        //   style: regular20white,
+        // ),
+        // TextButton(
+        //   onPressed: () {
+        //     Navigator.of(context).pushReplacement(
+        //       MaterialPageRoute(
+        //         builder: (context) => const CreateUserScreen(),
+        //       ),
+        //     );
+        //   },
+        //   style: ButtonStyle(
+        //     padding: MaterialStateProperty.all(
+        //       EdgeInsets.zero,
+        //     ),
+        //   ),
+        //   child: Text(
+        //     "sign up",
+        //     style: regular20green6EEB83,
+        //   ),
+        // ),
       ],
     );
   }
@@ -223,33 +233,33 @@ class _LoginScreenState extends State<LoginScreen> {
             _validateAndSubmitForm(context);
           },
         ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "don't have an account?",
-              style: regular20white,
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => const CreateUserScreen(),
-                  ),
-                );
-              },
-              style: ButtonStyle(
-                padding: MaterialStateProperty.all(
-                  EdgeInsets.zero,
-                ),
-              ),
-              child: Text(
-                "sign-up",
-                style: regular20green6EEB83,
-              ),
-            ),
-          ],
-        )
+        // Column(
+        //   crossAxisAlignment: CrossAxisAlignment.start,
+        //   children: [
+        //     Text(
+        //       "don't have an account?",
+        //       style: regular20white,
+        //     ),
+        //     TextButton(
+        //       onPressed: () {
+        //         Navigator.of(context).pushReplacement(
+        //           MaterialPageRoute(
+        //             builder: (context) => const CreateUserScreen(),
+        //           ),
+        //         );
+        //       },
+        //       style: ButtonStyle(
+        //         padding: MaterialStateProperty.all(
+        //           EdgeInsets.zero,
+        //         ),
+        //       ),
+        //       child: Text(
+        //         "sign-up",
+        //         style: regular20green6EEB83,
+        //       ),
+        //     ),
+        //   ],
+        // )
       ],
     );
   }
@@ -267,26 +277,34 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
 
-        var _client = APICLient();
-        var _response = await _client.getToken(
+        var client = APICLient();
+        TokenResponseBody? response = await client.getToken(
           _userNameController.text.toString(),
           _passwordController.text.toString(),
         );
 
-        // if (_response == Null) {
-        //   ScaffoldMessenger.of(context).showSnackBar(
-        //     const SnackBar(
-        //       content: Text('Signup failed.'),
-        //     ),
-        //   );
-        // } else {
-        //   ScaffoldMessenger.of(context).showSnackBar(
-        //     SnackBar(
-        //       content: Text(
-        //           'Welcome, ${_response!}!\nYou are successfully Signed Up.'),
-        //     ),
-        //   );
-        // }
+        if (response == Null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Login failed.'),
+            ),
+          );
+        } else {
+          setTokenPref(response!.accessToken!);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'Welcome, ${response.accessToken}!\nYou are successfully Logged In.'),
+            ),
+          );
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => const DashboardScreen(),
+            ),
+          );
+
+          // Navigator.pushReplacementNamed(context, "/dashboard");
+        }
 
         setState(() {
           _isLoading = false;

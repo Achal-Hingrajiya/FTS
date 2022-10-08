@@ -31,7 +31,7 @@ class _CustomTextFormFieldState extends State<CustomPasswordFormField> {
   Widget build(BuildContext context) {
     var _outlineInputBorder = OutlineInputBorder(
       borderSide: BorderSide(
-        color: green6EEB83,
+        color: grey5261,
       ),
       borderRadius: BorderRadius.circular(0),
     );
@@ -47,7 +47,7 @@ class _CustomTextFormFieldState extends State<CustomPasswordFormField> {
           onTap: showHideText,
           child: Icon(
             _icon,
-            color: green6EEB83,
+            color: grey5261,
           ),
         ),
         hintStyle: light16greyA5A5A5,

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:office_doc_tracing/constants.dart';
 import 'package:office_doc_tracing/functions/client.dart';
-import 'package:office_doc_tracing/screens/login_screen.dart';
 import 'package:office_doc_tracing/widgets/custom_password_form_field.dart';
 import 'package:office_doc_tracing/widgets/custom_positive_button.dart';
 import 'package:office_doc_tracing/widgets/custom_text_form_field.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class CreateUserScreen extends StatefulWidget {
@@ -15,20 +15,35 @@ class CreateUserScreen extends StatefulWidget {
 }
 
 class _CreateUserScreenState extends State<CreateUserScreen> {
-  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _mobileController = TextEditingController();
   final _userNameController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
+  final _createUserFormKey = GlobalKey<FormState>();
   bool _isLoading = false;
+
+  String? token;
+
+  fetchTokenFromPref() async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    setState(() {
+      token = _prefs.getString("token");
+    });
+    // print("Get tooooken in create user screen: $token");
+  }
+
+  @override
+  void initState() {
+    fetchTokenFromPref();
+    super.initState();
+  }
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _emailController.dispose();
+    _mobileController.dispose();
     _userNameController.dispose();
     _passwordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -94,7 +109,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
         Container(
           height: height,
           width: 4,
-          color: green6EEB83,
+          color: grey5261,
         ),
         Expanded(
           child: _buildFormContainer(
@@ -116,7 +131,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
   ) {
     return Container(
       height: height,
-      color: black,
+      color: greyF0F5F9,
       padding: pading_around_form,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -131,11 +146,11 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                   children: [
                     Text(
                       "Welcome",
-                      style: regular48white,
+                      style: regular48black,
                     ),
                     Text(
                       "Let’s create a new user quickly",
-                      style: light24greyA5A5A5,
+                      style: light24black,
                     ),
                   ],
                 ),
@@ -147,13 +162,13 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
           ),
           Expanded(
             child: Form(
-              key: _formKey,
+              key: _createUserFormKey,
               child: SingleChildScrollView(
                 child: Column(
                   children: [
                     CustomTextFormField(
                       hintText: "Enter user's full name",
-                      controller: _nameController,
+                      controller: _userNameController,
                       validator: _validateName,
                     ),
                     sizedBoxH22W0,
@@ -165,30 +180,30 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                     sizedBoxH22W0,
                     CustomTextFormField(
                       hintText: "Enter user's mobile number",
-                      controller: _emailController,
+                      controller: _mobileController,
                       validator: _validateEmail,
                     ),
                     sizedBoxH22W0,
                     Container(
                       color: Colors.white,
                       child: SfDateRangePicker(
-                        selectionTextStyle: regular20green6EEB83,
-                        selectionColor: white,
-                        backgroundColor: black,
-                        todayHighlightColor: green6EEB83,
-                        yearCellStyle: DateRangePickerYearCellStyle(
-                          textStyle: regular20white,
-                        ),
-                        monthCellStyle: DateRangePickerMonthCellStyle(
-                          textStyle: regular20white,
-
-                          // blackoutDateTextStyle: regular20white
-                        ),
-                        headerStyle: DateRangePickerHeaderStyle(
-                          backgroundColor: black,
-                          textStyle: regular20green6EEB83,
-                        ),
-                        rangeTextStyle: regular20green6EEB83,
+                        // selectionTextStyle: regular20green6EEB83,
+                        // selectionColor: white,
+                        backgroundColor: greyF0F5F9,
+                        // todayHighlightColor: grey5261,
+                        // yearCellStyle: DateRangePickerYearCellStyle(
+                        //   textStyle: regular20white,
+                        // ),
+                        // monthCellStyle: DateRangePickerMonthCellStyle(
+                        //   textStyle: regular20white,
+                        //
+                        //   // blackoutDateTextStyle: regular20white
+                        // ),
+                        // headerStyle: DateRangePickerHeaderStyle(
+                        //   backgroundColor: black,
+                        //   textStyle: regular20green6EEB83,
+                        // ),
+                        // rangeTextStyle: regular20green6EEB83,
                       ),
                     ),
                     // CustomTextFormField(
@@ -236,7 +251,6 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
             },
           ),
         ),
-
       ],
     );
   }
@@ -258,7 +272,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
 
   Future<void> _validateAndSubmitForm(BuildContext context) async {
     {
-      if (_formKey.currentState!.validate()) {
+      if (_createUserFormKey.currentState!.validate()) {
         setState(() {
           _isLoading = true;
         });
@@ -270,25 +284,39 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
         );
 
         var _client = APICLient();
-        var _response = await _client.register(
-          _userNameController.text.toString(),
-          _nameController.text.toString(),
-          _emailController.text.toString(),
-          false,
-          _passwordController.text.toString(),
-        );
+        var _response;
+        try {
+          try {
+            print("Tokkken: ${token!}\nFull name: ${_userNameController.text}\nEmail: ${_emailController.text}\nPassword: ${_passwordController.text}\nMobile: ${_mobileController.text}");
+          } catch (e) {
+            print("Error occurred Tooken is null: ${e.toString()}");
+          }
+           _response = await _client.createUser(
+              token!,
+              _userNameController.text,
+              _emailController.text,
+              _passwordController.text,
+              _mobileController.text,
+              "2001-10-04",
+              ["All permissions"],
+              [],
+              []);
+        } catch (e) {
+          print("Error occurred while user creation : ${e.toString()}");
+        }
+
 
         if (_response == Null) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Signup failed.'),
+              content: Text('User Creation failed.'),
             ),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                  'Welcome, ${_response!}!\nYou are successfully Signed Up.'),
+                  'User named, ${_response!.fullName}!\nHaving email: ${_response.email} created successfully.'),
             ),
           );
         }
